@@ -3,4 +3,4 @@ __pycache__
 stuff/*
 venv/*
 model/yolov4-hand-gesture.weights
-test.py
+# test.py
