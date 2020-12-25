@@ -3,12 +3,14 @@ import cv2
 from imutils.video import FPS
 import keyboard
 
+from utils.motion_analyser import MotionAnalyser
+
 
 def get_class_with_max_confidence(outputs, conf_threshold):
     d = {}
     for i in outputs:
         part = i[:, 5:]  # get confidences of classes
-        index = np.unravel_index(np.argmax(part), part.shape)  # index of max confidence in output layer
+        index = np.unravel_index(np.argmax(part), part.shape)  # index tuple of max confidence in output layer
         d[index] = part[index]
 
     if max(d.values()) < conf_threshold:  # max confidence is less than threshold
@@ -39,14 +41,18 @@ def yolo_detection(gesture_lock):
     address = "http://192.168.1.193:8080/video"
     cap.open(address)
     fps = FPS().start()
+    W = cap.get(3)
+    H = cap.get(4)
+    ma = MotionAnalyser(W, H)
 
     while cap.isOpened():
-        ret, image = cap.read()
+        ret, frame = cap.read()
         if not ret:
             print('Video file finished.')
             break
+        frame = cv2.flip(frame, 1)
 
-        class_id = make_prediction(net, layer_names, image, conf_threshold=0.9)
+        class_id = make_prediction(net, layer_names, frame, conf_threshold=0.9)
         if class_id is not None:  # keep previous state, if None
             gesture_lock.set_gesture(labels[class_id])
 
