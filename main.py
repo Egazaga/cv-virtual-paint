@@ -2,7 +2,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 from main_cam_loop import main_cam
 from yolo_detection_loop import yolo_detection
-from utils.gesture_lock import GestureLock
+from utils.locks import GestureLock
 
 
 if __name__ == '__main__':
