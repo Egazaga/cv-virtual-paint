@@ -8,7 +8,7 @@ https://drive.google.com/file/d/1RH37aFcNyoAesPxnTW4JE8VzGKSaEUTo/view?usp=shari
 
 ## Useful Links
 ### Pre-built OpenCV Versions with CUDA Support
-Copy lib\python3\cv2.cp37-win_amd64.pyd from archive to \venv\Lib\site-packages. With CUDA detection rate is around 17 fps on GTX 1060 6GB, without CUDA it's 1 fps.  
+Copy lib\python3\cv2.cp37-win_amd64.pyd from archive to \venv\Lib\site-packages. You also have to copy install/ folder somewhere and add "...\install\x64\vc16\bin" to PATH. With CUDA detection rate is around 17 fps on GTX 1060 6GB, without CUDA it's 1 fps.  
 https://jamesbowley.co.uk/downloads/
 ### Google Colab for yolov4 Training
 Google colab is a free remote linux server with IPython environment and Nvidia Tesla GPU. Link leads to a tutorial for training the model.  
