@@ -1,6 +1,6 @@
 import cv2
 import mediapipe as mp
-from imutils.video import FPS
+from utils.init_cam import init_cam
 
 
 def n_fingers(hand_landmarks):
@@ -13,10 +13,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
 
-cap = cv2.VideoCapture(0)
-address = "http://192.168.1.193:8080/video"
-cap.open(address)
-fps = FPS().start()
+cap, fps = init_cam(phone_cam=False)
 
 while cap.isOpened():
     fps.update()
@@ -32,7 +29,7 @@ while cap.isOpened():
     if results.multi_hand_landmarks:
         for mh in results.multi_handedness:
             label = mh.classification[0].label
-            if label == "Left\r":
+            if label == "Left":
                 n_fingers(results.multi_hand_landmarks[0])
         for hand_landmarks in results.multi_hand_landmarks:
             mp_drawing.draw_landmarks(

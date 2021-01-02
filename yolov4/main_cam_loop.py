@@ -1,16 +1,16 @@
 import cv2
 from imutils.video import FPS
-from utils.drawing import Drawing
+from yolov4.drawing import Drawing
+from utils.init_cam import init_cam
+from yolov4.lock import GestureLock
 
 
-def main_cam(gesture_lock):
-    cap = cv2.VideoCapture(0)
-    address = "http://192.168.1.193:8080/video"
-    cap.open(address)
-
-    fps = FPS().start()
+def main_cam(gesture_lock, phone_cam):
+    cap, fps = init_cam(phone_cam)
     fps_count = 0.0
-    drawing = Drawing()
+    W = cap.get(3)
+    H = cap.get(4)
+    drawing = Drawing(W, H)
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -19,7 +19,7 @@ def main_cam(gesture_lock):
             break
         frame = cv2.flip(frame, 1)
         gesture, action = gesture_lock.get_gesture()
-        text = action + " (" + gesture + ")"
+        text = action + " (" + str(gesture) + ")"
         cv2.putText(frame, text=text, org=(30, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=3,
                     color=(0, 255, 20), thickness=5)
         frame = drawing.process_frame(frame, action)
@@ -38,3 +38,7 @@ def main_cam(gesture_lock):
 
     cap.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    main_cam(gesture_lock=GestureLock(True), phone_cam=False)

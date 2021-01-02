@@ -4,11 +4,9 @@ import cv2
 
 
 class Drawing:
-    def __init__(self):
-        self.purple_range = np.array([[120, 32, 182], [154, 255, 255]])  # purple boundaries in hsv
-        self.noiseth = 100  # threshold
+    def __init__(self, W, H):
         self.x1, self.y1 = 0, 0
-        self.canvas = np.zeros((1080, 1920, 3), dtype=np.uint8)
+        self.canvas = np.zeros((int(H), int(W), 3), dtype=np.uint8)
         self.previous_action = ""
 
     def process_frame(self, frame, action):
@@ -23,7 +21,7 @@ class Drawing:
                 x2 = int(x2 + w / 2)  # center of box
                 y2 = int(y2 + h / 2)
 
-                # if we have same action, and coordinates of marker from previous frame
+                # if we have same action, and coordinates of a pen from previous frame
                 if action == self.previous_action and self.x1 != 0 and self.y1 != 0:
                     color = []
                     if action == "Erasing":
@@ -36,6 +34,8 @@ class Drawing:
                         color = [0, 255, 0]
                     elif action == "Blue":
                         color = [255, 0, 0]
+                    elif action == "Black":
+                        color = [0, 0, 0]
                     thickness = int(math.sqrt(max_area) / 1.5)
                     self.canvas = cv2.line(self.canvas, (self.x1, self.y1), (x2, y2), color, thickness=thickness)
                 self.x1, self.y1 = x2, y2

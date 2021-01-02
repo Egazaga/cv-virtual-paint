@@ -1,24 +1,22 @@
 import numpy as np
 import cv2
-from imutils.video import FPS
+import keyboard
+
+from utils.init_cam import init_cam
 from utils.motion_analyser import MotionAnalyser
 
 
 def get_class_with_max_confidence(outputs, conf_threshold):
-    max_tuple = (0, 0, 0)
+    d = {}
     for i in outputs:
         part = i[:, 5:]  # get confidences of classes
         index = np.unravel_index(np.argmax(part), part.shape)  # index tuple of max confidence in output layer
-        conf = part[index]
-        if conf > max_tuple[0] and conf > conf_threshold:
-            classID = index[1]
-            center = i[index[0]][0:2]
-            max_tuple = (conf, classID, center)
+        d[index] = part[index]
 
-    if max_tuple[0] == 0:  # didn't find bb
-        return None, None, None
+    if max(d.values()) < conf_threshold:  # max confidence is less than threshold
+        return None
     else:
-        return max_tuple
+        return int(max(d, key=d.get)[1])  # class ID of max confidence
 
 
 def make_prediction(net, layer_names, image, conf_threshold):
@@ -28,20 +26,18 @@ def make_prediction(net, layer_names, image, conf_threshold):
     return get_class_with_max_confidence(outputs, conf_threshold)
 
 
-if __name__ == '__main__':
-    labels = open('model/_darknet.labels').read().strip().split('\n')
+def yolo_detection(gesture_lock, phone_cam):
+    labels = open('../model/_darknet.labels').read().strip().split('\n')
     cfg, weights = 'model/custom-yolov4-detector.cfg', 'model/yolov4-hand-gesture.weights'
     net = cv2.dnn.readNetFromDarknet(cfgFile=cfg, darknetModel=weights)
 
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
     layer_names = net.getLayerNames()
     layer_names = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
-    cap = cv2.VideoCapture(0)
-    address = "http://192.168.1.193:8080/video"
-    cap.open(address)
-    fps = FPS().start()
+    cap, fps = init_cam(phone_cam)
     W = cap.get(3)
     H = cap.get(4)
     ma = MotionAnalyser(W, H)
@@ -53,22 +49,12 @@ if __name__ == '__main__':
             break
         frame = cv2.flip(frame, 1)
 
-        conf, class_id, center = make_prediction(net, layer_names, frame, conf_threshold=0.6)
-        if class_id is None:
-            text = "None"
-        else:
-            text = labels[class_id]
-            center = (int(center[0] * W), int(center[1] * H))
-            cv2.circle(frame, center, 35, [0, 255, 20], thickness=-1)
-            motion = ma.analyse(center, gesture=text)
-            if motion is not None:
-                print(motion)
-
-        cv2.putText(frame, text=text, org=(30, 100), fontFace=0, fontScale=3, color=(0, 255, 20), thickness=5)
+        class_id = make_prediction(net, layer_names, frame, conf_threshold=0.9)
+        if class_id is not None:  # keep previous state, if None
+            gesture_lock.set_gesture(labels[class_id])
 
         fps.update()
-        cv2.imshow('Cam', frame)
-        if cv2.waitKey(1) & 0xFF == 27:
+        if keyboard.is_pressed('esc'):  # can't use cv's waitKey, cuz no window
             break
 
     fps.stop()
