@@ -3,18 +3,17 @@ import threading
 
 class GestureLock:
     def __init__(self):
-        self.gesture = "No gesture"
-        self.action = "No action"
-        self.pairs = {3: "Yellow", 5: "Erasing", 0: "Green", 2: "Brown", 1: "Blue", 4: "Black"}
+        self.info = (None, None, None)
         self.lock = threading.Lock()
 
     def get_gesture(self):
         with self.lock:
-            gesture = self.gesture
-            action = self.action
-        return gesture, action
+            info = self.info
+        return info
 
-    def set_gesture(self, gesture):
+    def set_gesture(self, n_fingers_l, pointy_r, thickness):
         with self.lock:
-            self.gesture = gesture
-            self.action = self.pairs[gesture]
+            if n_fingers_l is not None:
+                self.info = (n_fingers_l, pointy_r, thickness)
+            else:  # keep previous gesture if none
+                self.info = (self.info[0], pointy_r, thickness)
