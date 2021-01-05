@@ -4,6 +4,7 @@ import keyboard
 
 from utils.init_cam import init_cam
 from utils.motion_analyser import MotionAnalyser
+from yolov4.lock import GestureLock
 
 
 def get_class_with_max_confidence(outputs, conf_threshold):
@@ -28,7 +29,7 @@ def make_prediction(net, layer_names, image, conf_threshold):
 
 def yolo_detection(gesture_lock, phone_cam):
     labels = open('../model/_darknet.labels').read().strip().split('\n')
-    cfg, weights = 'model/custom-yolov4-detector.cfg', 'model/yolov4-hand-gesture.weights'
+    cfg, weights = '../model/custom-yolov4-detector.cfg', '../model/yolov4-hand-gesture.weights'
     net = cv2.dnn.readNetFromDarknet(cfgFile=cfg, darknetModel=weights)
 
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
@@ -38,20 +39,19 @@ def yolo_detection(gesture_lock, phone_cam):
     layer_names = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
     cap, fps = init_cam(phone_cam)
-    W = cap.get(3)
-    H = cap.get(4)
+    # W = cap.get(3)
+    # H = cap.get(4)
+    W = 1920
+    H = 1080
     ma = MotionAnalyser(W, H)
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            print('Video file finished.')
-            break
+    while True:
+        frame = cap.read()
         frame = cv2.flip(frame, 1)
 
         class_id = make_prediction(net, layer_names, frame, conf_threshold=0.9)
         if class_id is not None:  # keep previous state, if None
-            gesture_lock.set_gesture(labels[class_id])
+            gesture_lock.set_gesture(gesture=labels[class_id])
 
         fps.update()
         if keyboard.is_pressed('esc'):  # can't use cv's waitKey, cuz no window
@@ -59,4 +59,8 @@ def yolo_detection(gesture_lock, phone_cam):
 
     fps.stop()
     print("Mean fps for detection:", round(fps.fps(), 2))
-    cap.release()
+    # cap.release()
+
+
+if __name__ == '__main__':
+    yolo_detection(GestureLock(), phone_cam=True)

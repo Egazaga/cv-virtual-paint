@@ -17,6 +17,7 @@ class Drawing:
                 color = []
                 if action == "Erasing":
                     color = [0, 0, 0]
+                    thickness = 90
                 elif action == "Yellow":
                     color = [0, 255, 255]  # in BGR
                 elif action == "Brown":
@@ -34,4 +35,10 @@ class Drawing:
         self.previous_action = action
 
         # return cv2.add(frame, self.canvas)
-        return cv2.addWeighted(frame, 0.3, self.canvas, 0.7, 0)
+        return cv2.addWeighted(frame, 1, self.canvas, 0.7, 0)
+
+    def move(self):
+        pass
+
+    def scale(self):
+        pass
