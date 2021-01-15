@@ -8,7 +8,7 @@ import queue, threading
 class VideoCapture:
     def __init__(self, name):
         self.cap = cv2.VideoCapture(name)
-        address = "http://192.168.137.226:8080/video"
+        address = "http://192.168.137.232:8080/video"
         self.cap.open(address)
         self.q = queue.Queue()
         t = threading.Thread(target=self._reader)

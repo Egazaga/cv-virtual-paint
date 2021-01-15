@@ -6,8 +6,9 @@ import cv2
 class Drawing:
     def __init__(self, W, H):
         # self.purple_range = np.array([[120, 32, 182], [154, 255, 255]])  # purple boundaries in hsv
-        self.purple_range = np.array([[0, 0, 250], [255, int(0.05 * 255), 255]])  # purple boundaries in hsv
-        self.noiseth = 100  # threshold
+        self.purple_range = np.array([[31, 255, 139], [47, 255, 255]])  # purple boundaries in hsv
+        # self.purple_range = np.array([[0, 0, 250], [255, int(0.05 * 255), 255]])  # white boundaries in hsv
+        self.noiseth = 1  # threshold
         self.x1, self.y1 = 0, 0
         self.canvas = np.zeros((int(H), int(W), 3), dtype=np.uint8)
         self.previous_action = ""
@@ -29,7 +30,7 @@ class Drawing:
                 return cv2.add(frame, self.canvas)
 
                 # if we have same action, and coordinates of a pen from previous frame
-                if action == self.previous_action and self.x1 != 0 and self.y1 != 0:
+                if action == self.ex_action and self.x1 != 0 and self.y1 != 0:
                     color = []
                     if action == "Erasing":
                         color = [0, 0, 0]
