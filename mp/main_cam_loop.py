@@ -43,6 +43,8 @@ def main_cam(phone_cam):
     mp_hands = mp.solutions.hands
     detector = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
     pairs = {3: "Yellow", 5: "Erasing", 0: "Green", 2: "Brown", 1: "Blue", 4: "Black"}
+    cv2.namedWindow("Cam", cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty("Cam", cv2.WND_PROP_FULLSCREEN, 1)
 
     while True:
         frame = cap.read()
@@ -60,14 +62,16 @@ def main_cam(phone_cam):
             text = "None "
 
         frame = drawing.process_frame(frame, x, y, area, action)
-        cv2.putText(frame, text=text + str(x), org=(30, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=3,
-                    color=(0, 255, 20), thickness=5)
+        cv2.putText(frame, text=text + str(x), org=(30, 100), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=2,
+                    color=(0, 255, 20), thickness=3)
         fps.update()
         if fps._numFrames == 25:
             fps.stop()
             fps_count = fps.fps()
             fps = FPS().start()
-        cv2.putText(frame, text=str(round(fps_count, 1)), org=(1350, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+        cv2.putText(frame, text=str(round(fps_count, 1)), org=(1750, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=2, color=(0, 255, 20), thickness=3)
+        cv2.putText(frame, text=str(round(drawing.scale_factor, 2)), org=(1750, 1000), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=2, color=(0, 255, 20), thickness=3)
 
         cv2.imshow('Cam', frame)

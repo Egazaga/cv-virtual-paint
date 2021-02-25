@@ -21,11 +21,9 @@ class Drawing:
         self.canvas = np.zeros((int(H * 3), int(W * 3), 3), dtype=np.uint8)
         self.view_center = int(W * 1.5), int(H * 1.5)
         cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
-        for x in range(3):
-            for y in range(3):
+        for x in range(4):
+            for y in range(4):
                 cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
-        # for i in range(100):
-        #     cv2.circle(self.canvas, (100 * i, 1200), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         self.view_corner = int(W), int(H)
         self.scale_factor = 1
         self.W, self.H = int(W), int(H)
@@ -78,18 +76,35 @@ class Drawing:
                self.view_corner[0]:self.view_corner[0] + int(self.W / self.scale_factor)]
         if self.scale_factor != 1:
             view = cv2.resize(view, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR)
-        return cv2.addWeighted(frame, 1, view, 0.7, 0)
+        return cv2.addWeighted(frame, 0.4, view, 0.6, 0)
 
     def move(self, dx, dy):
-        move_x, move_y = 0, 0
-        if self.view_corner[0] != 0 and self.view_corner[0] != self.W * 3 - self.W / self.scale_factor:
-            move_x = int(-dx / self.scale_factor)
-        if self.view_corner[1] != 0 and self.view_corner[1] != self.H * 3 - self.H / self.scale_factor:
-            move_y = int(-dy / self.scale_factor)
+        speed = 2.5
+        move_x = int(-dx / self.scale_factor * speed)
+        move_y = int(-dy / self.scale_factor * speed)
+
+        if (self.view_corner[0] + move_x < 0) or \
+                (self.view_corner[0] + move_x + self.W / self.scale_factor > 3 * self.W):
+            move_x = 0
+
+        if (self.view_corner[1] + move_y < 0) or \
+                (self.view_corner[1] + move_y + self.H / self.scale_factor > 3 * self.H):
+            move_y = 0
+
         self.view_corner = tuple(map(add, self.view_corner, (move_x, move_y)))
 
     def scale(self, dy):
-        if (self.scale_factor > 2.9 and dy < 0) or (self.scale_factor < 0.1 and dy > 0):
-            return
-        else:
-            self.scale_factor -= dy / 700
+        new_scale = self.scale_factor - dy / 700
+        if 0.34 < new_scale < 1.5:
+            if new_scale < self.scale_factor:
+                near_right_border = self.view_corner[0] + self.W / new_scale > 3 * self.W
+                near_bottom_border = self.view_corner[1] + self.H / new_scale > 3 * self.H
+                if near_right_border or near_bottom_border:
+                    scale_diff = self.scale_factor - new_scale
+                    move_x = int(-self.W * scale_diff)
+                    move_y = int(-self.H * scale_diff)
+                    print(self.view_corner[0] + self.W / new_scale - 3 * self.W, self.view_corner[1] + self.H / new_scale - 3 * self.H)
+                    print(move_x, move_y)
+                    self.view_corner = tuple(map(add, self.view_corner, (move_x, move_y)))
+
+            self.scale_factor = new_scale
