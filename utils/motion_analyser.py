@@ -41,17 +41,3 @@ class MotionAnalyser:
             self.drawing.move(dx, dy)
         elif gesture == 0:
             self.drawing.scale(dy)
-
-        # direction = None
-        # if self.total_dx > self.min_length_of_move_x:
-        #     direction = Directions.RIGHT
-        # if self.total_dx < -self.min_length_of_move_x:
-        #     direction = Directions.LEFT
-        # if self.total_dy > self.min_length_of_move_y:
-        #     direction = Directions.DOWN
-        # if self.total_dy < -self.min_length_of_move_y:
-        #     direction = Directions.UP
-        # if direction is not None:
-        #     self.total_dx = 0
-        #     self.total_dy = 0
-        # return direction

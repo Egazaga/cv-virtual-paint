@@ -1,20 +1,20 @@
 import math
 from operator import add
 
-import numpy as np
 import cv2
+import numpy as np
 
-hsv = (155, 117, 139)
-hsv = np.uint8([[[hsv[2], hsv[1], hsv[0]]]])
-hsv = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[0][0]
-hsv = np.array([int(hsv[0] / 2), int(hsv[1] / 100 * 255), int(hsv[2] / 100 * 255)])
-dc = 20
+
+# hsv = (155, 117, 139)
+# hsv = np.uint8([[[hsv[2], hsv[1], hsv[0]]]])
+# hsv = cv2.cvtColor(hsv, cv2.COLOR_BGR2HSV)[0][0]
+# hsv = np.array([int(hsv[0] / 2), int(hsv[1] / 100 * 255), int(hsv[2] / 100 * 255)])
+# dc = 20
 
 
 class Drawing:
     def __init__(self, W, H):
-        self.purple_range = np.array([[0, 0, 250], [255, int(0.05 * 255), 255]])  # purple boundaries in hsv
-        self.purple_range = np.array([hsv - dc, hsv + dc])  # purple boundaries in hsv
+        self.pen_color_range = np.array([[48, 32, 167], [88, 72, 207]])
         self.noiseth = 100  # threshold
         self.ex_pen_pos = 0, 0
         self.ex_action = None
@@ -28,10 +28,15 @@ class Drawing:
         self.scale_factor = 1
         self.W, self.H = int(W), int(H)
 
+    def set_pen_color(self, color):
+        dc = 20
+        print("Set", color)
+        self.pen_color_range = np.array([color - dc, color + dc])
+
     def find_pen(self, frame):
         x, y, w, h, area = None, None, None, None, None
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, self.purple_range[0], self.purple_range[1])
+        mask = cv2.inRange(hsv, self.pen_color_range[0], self.pen_color_range[1])
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if contours:
             area = cv2.contourArea(max(contours, key=cv2.contourArea))
@@ -72,39 +77,38 @@ class Drawing:
             self.canvas = cv2.line(self.canvas, pt1, pt2, color, thickness=thickness)
             self.ex_pen_pos = (x + self.view_corner[0], y + self.view_corner[1])
 
-        view = self.canvas[self.view_corner[1]:self.view_corner[1] + int(self.H / self.scale_factor),
-               self.view_corner[0]:self.view_corner[0] + int(self.W / self.scale_factor)]
+        view = self.canvas[self.view_corner[1]:self.view_corner[1] + int(self.H * self.scale_factor),
+               self.view_corner[0]:self.view_corner[0] + int(self.W * self.scale_factor)]
         if self.scale_factor != 1:
             view = cv2.resize(view, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR)
-        return cv2.addWeighted(frame, 0.4, view, 0.6, 0)
+        return cv2.addWeighted(frame, 1, view, 0.6, 0)
 
-    def move(self, dx, dy):
-        speed = 2.5
-        move_x = int(-dx / self.scale_factor * speed)
-        move_y = int(-dy / self.scale_factor * speed)
+    def move(self, dx, dy, speed=2.5):
+        move_x = int(-dx * self.scale_factor * speed)
+        move_y = int(-dy * self.scale_factor * speed)
 
         if (self.view_corner[0] + move_x < 0) or \
-                (self.view_corner[0] + move_x + self.W / self.scale_factor > 3 * self.W):
+                (self.view_corner[0] + move_x + self.W * self.scale_factor > 3 * self.W):
             move_x = 0
 
         if (self.view_corner[1] + move_y < 0) or \
-                (self.view_corner[1] + move_y + self.H / self.scale_factor > 3 * self.H):
+                (self.view_corner[1] + move_y + self.H * self.scale_factor > 3 * self.H):
             move_y = 0
 
         self.view_corner = tuple(map(add, self.view_corner, (move_x, move_y)))
 
-    def scale(self, dy):
-        new_scale = self.scale_factor - dy / 700
-        if 0.34 < new_scale < 1.5:
-            if new_scale < self.scale_factor:
-                near_right_border = self.view_corner[0] + self.W / new_scale > 3 * self.W
-                near_bottom_border = self.view_corner[1] + self.H / new_scale > 3 * self.H
+    def scale(self, dy, speed=2.5):
+        speed = 1080 / speed
+        new_scale = self.scale_factor + dy / speed
+        if 0.5 < new_scale < 3:
+            if new_scale > self.scale_factor:
+                bottom_right_w_in_next_frame = self.view_corner[0] + self.W * new_scale
+                bottom_right_h_in_next_frame = self.view_corner[1] + self.H * new_scale
+                near_right_border = bottom_right_w_in_next_frame > 3 * self.W
+                near_bottom_border = bottom_right_h_in_next_frame > 3 * self.H
                 if near_right_border or near_bottom_border:
-                    scale_diff = self.scale_factor - new_scale
-                    move_x = int(-self.W * scale_diff)
-                    move_y = int(-self.H * scale_diff)
-                    print(self.view_corner[0] + self.W / new_scale - 3 * self.W, self.view_corner[1] + self.H / new_scale - 3 * self.H)
-                    print(move_x, move_y)
+                    move_x = math.ceil(-bottom_right_w_in_next_frame + 3 * self.W)
+                    move_y = math.ceil(-bottom_right_h_in_next_frame + 3 * self.H)
                     self.view_corner = tuple(map(add, self.view_corner, (move_x, move_y)))
 
             self.scale_factor = new_scale

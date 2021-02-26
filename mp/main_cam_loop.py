@@ -1,17 +1,13 @@
-import math
-
 import cv2
+import mediapipe as mp
 from imutils.video import FPS
-from mediapipe.python.solutions.hands import HAND_CONNECTIONS
 
 from mp.drawing import Drawing
-import mediapipe as mp
-
 from utils.init_cam import init_cam
 from utils.motion_analyser import MotionAnalyser
 
 
-def _count_fingers(frame, detector):
+def _count_fingers(frame, detector, hand="Left"):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     frame.flags.writeable = False
     results = detector.process(frame)
@@ -23,12 +19,18 @@ def _count_fingers(frame, detector):
             # mp_drawing.draw_landmarks(frame, lm, HAND_CONNECTIONS)
             label = mh.classification[0].label
             lm = lm.landmark
-            if label == "Left":
+            if label == hand:
                 n_fingers_l = (lm[4].x > lm[3].x) + (lm[8].y < lm[7].y) + (lm[12].y < lm[11].y) + (
                         lm[16].y < lm[15].y) + (lm[20].y < lm[19].y)
                 sh = frame.shape
                 center_l = (lm[9].x * sh[1], lm[9].y * sh[0])
     return n_fingers_l, center_l
+
+
+def callback(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        drawing = param[0]
+        drawing.set_pen_color(param[1][y, x])
 
 
 def main_cam(phone_cam):
@@ -49,6 +51,8 @@ def main_cam(phone_cam):
     while True:
         frame = cap.read()
         frame = cv2.flip(frame, 1)
+        print("Cent", frame[540, 960], "Set", drawing.pen_color_range[0])
+        cv2.setMouseCallback('Cam', callback, (drawing, frame))
         n_fingers_l, center_l = _count_fingers(frame, detector)
         x, y, area = drawing.find_pen(frame)
         if x is None:  # no pen in frame
@@ -71,7 +75,8 @@ def main_cam(phone_cam):
             fps = FPS().start()
         cv2.putText(frame, text=str(round(fps_count, 1)), org=(1750, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=2, color=(0, 255, 20), thickness=3)
-        cv2.putText(frame, text=str(round(drawing.scale_factor, 2)), org=(1750, 1000), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+        cv2.putText(frame, text=str(round(drawing.scale_factor, 2)), org=(1750, 1000),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=2, color=(0, 255, 20), thickness=3)
 
         cv2.imshow('Cam', frame)
