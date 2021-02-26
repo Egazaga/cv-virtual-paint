@@ -51,7 +51,6 @@ def main_cam(phone_cam):
     while True:
         frame = cap.read()
         frame = cv2.flip(frame, 1)
-        print("Cent", frame[540, 960], "Corner", frame[0, 0], "Set", drawing.pen_color_range[0])
         cv2.setMouseCallback('Cam', callback, (drawing, frame))
         n_fingers_l, center_l = _count_fingers(frame, detector)
         x, y, area = drawing.find_pen(frame)
