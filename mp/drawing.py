@@ -29,14 +29,18 @@ class Drawing:
         self.W, self.H = int(W), int(H)
 
     def set_pen_color(self, color):
-        dc = 20
+        dh, ds, dv = 20, 50, 50
+        d = np.array([dh, ds, dv])
+        color = cv2.cvtColor(np.array([[color]]), cv2.COLOR_BGR2HSV)[0, 0]  # brg to hsv
         print("Set", color)
-        self.pen_color_range = np.array([color - dc, color + dc])
+        self.pen_color_range = np.array([color - d, color + d])
+        np.where(self.pen_color_range < 0, 0, self.pen_color_range)
 
     def find_pen(self, frame):
         x, y, w, h, area = None, None, None, None, None
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self.pen_color_range[0], self.pen_color_range[1])
+        self.canvas[1080:2160, 1920:3840] = np.stack((mask, mask, mask), axis=2)  # debug
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if contours:
             area = cv2.contourArea(max(contours, key=cv2.contourArea))
