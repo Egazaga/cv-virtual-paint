@@ -25,10 +25,10 @@ class Drawing:
         self.thickness_scale = 2
 
     def set_pen_color(self, color):
-        color = cv2.cvtColor(np.array([[color]]), cv2.COLOR_BGR2HSV)[0, 0]  # brg to hsv
+        color = cv2.cvtColor(np.array([[color]], dtype="uint8"), cv2.COLOR_BGR2HSV)[0, 0]  # brg to hsv
         print("Set", color)
         self.pen_color_range = np.array([color - self.d_color_range, color + self.d_color_range])
-        np.where(self.pen_color_range < 0, 0, self.pen_color_range)
+        self.pen_color_range = np.where(self.pen_color_range < 0, 0, self.pen_color_range)
 
     def find_pen(self, frame):
         x, y, w, h, area = None, None, None, None, None
