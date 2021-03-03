@@ -15,10 +15,10 @@ class Drawing:
         self.ex_action = None
         self.canvas = np.zeros((int(H * 3), int(W * 3), 3), dtype=np.uint8)
         self.view_center = int(W * 1.5), int(H * 1.5)
-        cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
-        for x in range(4):
-            for y in range(4):
-                cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        # cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        # for x in range(4):
+        #     for y in range(4):
+        #         cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         self.view_corner = int(W), int(H)
         self.scale_factor = 1
         self.W, self.H = int(W), int(H)
@@ -46,7 +46,6 @@ class Drawing:
         return x, y, area
 
     def process_frame(self, frame, x, y, area, action):
-        print(x, y)
         if x is None:
             self.ex_action = None
             self.ex_pen_pos = 0, 0
