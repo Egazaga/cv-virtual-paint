@@ -1,15 +1,17 @@
+import queue
+import threading
+
 import cv2
 from imutils.video import FPS
-
-import queue, threading
 
 
 # bufferless VideoCapture
 class VideoCapture:
-    def __init__(self, name):
+    def __init__(self, name, phone_cam):
         self.cap = cv2.VideoCapture(name)
-        address = "http://192.168.1.193:8080/video"
-        self.cap.open(address)
+        if phone_cam:
+            address = "http://192.168.1.193:8080/video"
+            self.cap.open(address)
         self.q = queue.Queue()
         t = threading.Thread(target=self._reader)
         t.daemon = True
@@ -36,6 +38,6 @@ class VideoCapture:
 
 
 def init_cam(phone_cam):
-    cap = VideoCapture(0)
+    cap = VideoCapture(0, phone_cam)
     fps = FPS().start()
     return cap, fps
