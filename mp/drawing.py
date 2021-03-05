@@ -15,10 +15,10 @@ class Drawing:
         self.ex_action = None
         self.canvas = np.zeros((int(H * 3), int(W * 3), 3), dtype=np.uint8)
         self.view_center = int(W * 1.5), int(H * 1.5)
-        # cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
-        # for x in range(4):
-        #     for y in range(4):
-        #         cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        for x in range(4):
+            for y in range(4):
+                cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         self.view_corner = int(W), int(H)
         self.scale_factor = 1
         self.W, self.H = int(W), int(H)
@@ -46,20 +46,26 @@ class Drawing:
         return x, y, area
 
     def process_frame(self, frame, x, y, area, action):
-        if x is None:
+        draw_circle = False
+        if x is None or action is None:
             self.ex_action = None
             self.ex_pen_pos = 0, 0
         elif action != self.ex_action:
             self.ex_action = action
             self.ex_pen_pos = 0, 0
         elif self.ex_pen_pos == (0, 0):
+            x = round(x * self.scale_factor)
+            y = round(y * self.scale_factor)
             self.ex_pen_pos = (x + self.view_corner[0], y + self.view_corner[1])
         else:  # if we have same action, and coordinates of a pen from previous frame
+            x = round(x * self.scale_factor)
+            y = round(y * self.scale_factor)
             color = []
             thickness = int(math.sqrt(area) * self.thickness_scale)
             if action == "Erasing":
                 color = [0, 0, 0]
-                thickness = 90
+                thickness *= 2
+                draw_circle = True
             elif action == "Yellow":
                 color = [0, 255, 255]  # in BGR
             elif action == "Brown":
@@ -72,14 +78,18 @@ class Drawing:
                 color = [255, 255, 255]
 
             pt2 = (x + self.view_corner[0], y + self.view_corner[1])
-            self.canvas = cv2.line(self.canvas, self.ex_pen_pos, pt2, color, thickness=thickness)
+            self.canvas = cv2.line(self.canvas, self.ex_pen_pos, pt2, color,
+                                   thickness=round(thickness * self.scale_factor))
             self.ex_pen_pos = pt2
 
         view = self.canvas[self.view_corner[1]:self.view_corner[1] + int(self.H * self.scale_factor),
                self.view_corner[0]:self.view_corner[0] + int(self.W * self.scale_factor)]
         if self.scale_factor != 1:
             view = cv2.resize(view, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR)
-        return cv2.addWeighted(frame, 0.5, view, 0.68, 0)
+        frame = cv2.addWeighted(frame, 0.5, view, 0.7, 0)
+        if draw_circle:
+            frame = cv2.circle(frame, (x, y), int(thickness / 2), [0, 0, 255], 3)
+        return frame
 
     def move(self, dx, dy, speed=2.5):
         move_x = int(-dx * self.scale_factor * speed)

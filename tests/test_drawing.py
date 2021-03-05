@@ -22,15 +22,12 @@ class TestDrawing(TestCase):
         self.assertTrue(np.array_equal(drawing.pen_color_range[0], color - drawing.d_color_range))
         self.assertTrue(np.array_equal(drawing.pen_color_range[1], color + drawing.d_color_range))
 
-    def test_find_pen(self):
-        # drawing = Drawing(1920, 1080)
-        # white_color = np.array([255, 255, 225])
-        # drawing.pen_color_range = np.array([white_color - drawing.d_color_range, white_color + drawing.d_color_range])
-        # drawing.find_pen()
-        self.fail()
-
-    def test_move(self):
-        self.fail()
+    # def test_find_pen(self):
+    #     # drawing = Drawing(1920, 1080)
+    #     # white_color = np.array([255, 255, 225])
+    #     # drawing.pen_color_range = np.array([white_color - drawing.d_color_range, white_color + drawing.d_color_range])
+    #     # drawing.find_pen()
+    #     self.fail()
 
 
 class TestProcessFrame(TestCase):

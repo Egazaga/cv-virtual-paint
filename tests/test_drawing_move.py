@@ -1,7 +1,9 @@
-import unittest
+from unittest import TestCase
+
 from mp.drawing import Drawing
 
-class TestDrawingMove(unittest.TestCase):
+
+class TestDrawingMove(TestCase):
     def setUp(self):
         self.width = 1920
         self.height = 1080
@@ -9,7 +11,7 @@ class TestDrawingMove(unittest.TestCase):
 
     def test_normal_move(self):
         oldpos = self.drawing.view_corner
-        
+
         dx = -10
         dy = -10
         speed = 2.5
@@ -23,7 +25,7 @@ class TestDrawingMove(unittest.TestCase):
     def test_move_top_left(self):
         self.drawing.view_corner = 0, 0
 
-        oldpos = self.drawing.view_corner 
+        oldpos = self.drawing.view_corner
 
         dx = 10
         dy = 10
