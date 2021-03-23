@@ -8,17 +8,14 @@ from yolov4.lock import GestureLock
 def main_cam(gesture_lock, phone_cam):
     cap, fps = init_cam(phone_cam)
     fps_count = 0.0
-    # W = cap.get(3)
-    # H = cap.get(4)
-    W = 1920
-    H = 1080
+    W = cap.get(3)
+    H = cap.get(4)
+    # W = 1920
+    # H = 1080
     drawing = Drawing(W, H)
 
     while True:
         frame = cap.read()
-        # if not ret:
-        #     print('Video file finished.')
-        #     break
         frame = cv2.flip(frame, 1)
         gesture, action = gesture_lock.get_gesture()
         text = action + " (" + str(gesture) + ")"

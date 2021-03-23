@@ -15,7 +15,7 @@ class Drawing:
 
     def process_frame(self, frame, action):
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, self.purple_range[0], self.purple_range[1])  # TODO rewrite to rgb
+        mask = cv2.inRange(hsv, self.purple_range[0], self.purple_range[1])
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if contours:
             max_area = cv2.contourArea(max(contours, key=cv2.contourArea))
@@ -25,9 +25,9 @@ class Drawing:
                 x2 = int(x2 + w / 2)  # center of box
                 y2 = int(y2 + h / 2)
 
-                # debug
-                self.canvas = cv2.circle(self.canvas, (x2, y2), color=[0, 0, 255], radius=25, thickness=-10)
-                return cv2.add(frame, self.canvas)
+                # # debug
+                # self.canvas = cv2.circle(self.canvas, (x2, y2), color=[0, 0, 255], radius=25, thickness=-10)
+                # return cv2.add(frame, self.canvas)
 
                 # if we have same action, and coordinates of a pen from previous frame
                 if action == self.ex_action and self.x1 != 0 and self.y1 != 0:

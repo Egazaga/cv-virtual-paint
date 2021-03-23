@@ -1,9 +1,10 @@
-from unittest import TestCase
-from utils.motion_analyser import MotionAnalyser
+import pytest
+
 from mp.drawing import Drawing
+from utils.motion_analyser import MotionAnalyser
 
 
-class TestMotionAnalyser(TestCase):
+class TestMotionAnalyser:
     def test_analyse_gesture_none(self):
         # Setup
         width = 1920
@@ -12,20 +13,16 @@ class TestMotionAnalyser(TestCase):
         gesture = None
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos, gesture)
         ma.analyse(pos, gesture)
-
-        # Check
         exp_gesture = gesture
         exp_pos = 0, 0
         exp_total_dx = 0
         exp_total_dy = 0
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
 
     def test_analyse_gesture_change_on_start(self):
         # Setup
@@ -35,19 +32,15 @@ class TestMotionAnalyser(TestCase):
         gesture = 1
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos, gesture)
-
-        # Check
         exp_gesture = gesture
         exp_pos = pos
         exp_total_dx = 0
         exp_total_dy = 0
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
 
     def test_analyse_gesture_same(self):
         # Setup
@@ -57,21 +50,17 @@ class TestMotionAnalyser(TestCase):
         gesture = 1
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos, gesture)
         ma.analyse(pos, gesture)
         ma.analyse(pos, gesture)
-
-        # Check
         exp_gesture = gesture
         exp_pos = pos
         exp_total_dx = pos[0]
         exp_total_dy = pos[1]
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
 
     def test_analyse_gesture_change(self):
         # Setup
@@ -83,24 +72,20 @@ class TestMotionAnalyser(TestCase):
         gesture_3 = 3
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos, gesture_1)
         ma.analyse(pos, gesture_1)
         ma.analyse(pos, gesture_2)
         ma.analyse(pos, gesture_2)
         ma.analyse(pos, gesture_1)
         ma.analyse(pos, gesture_3)
-
-        # Check
         exp_gesture = gesture_3
         exp_pos = pos
         exp_total_dx = pos[0]
         exp_total_dy = pos[0]
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
 
     def test_analyse_gesture_same_in_motion(self):
         # Setup
@@ -114,23 +99,19 @@ class TestMotionAnalyser(TestCase):
         gesture = 1
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos_1, gesture)
         ma.analyse(pos_2, gesture)
         ma.analyse(pos_3, gesture)
         ma.analyse(pos_4, gesture)
         ma.analyse(pos_5, gesture)
-
-        # Check
         exp_gesture = gesture
         exp_pos = pos_5
         exp_total_dx = 11
         exp_total_dy = 0
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
 
     def test_analyse_gesture_change_in_motion(self):
         # Setup
@@ -146,21 +127,17 @@ class TestMotionAnalyser(TestCase):
         gesture_3 = 3
         drawing = Drawing(width, height)
         ma = MotionAnalyser(width, height, drawing)
-
-        # Act
         ma.analyse(pos_1, gesture_1)
         ma.analyse(pos_2, gesture_1)
         ma.analyse(pos_3, gesture_2)
         ma.analyse(pos_3, gesture_2)
         ma.analyse(pos_4, gesture_1)
         ma.analyse(pos_5, gesture_3)
-
-        # Check
         exp_gesture = gesture_3
         exp_pos = pos_5
         exp_total_dx = 0
         exp_total_dy = 0
-        self.assertEqual(exp_gesture, ma.ex_gesture)
-        self.assertAlmostEqual(exp_pos, ma.ex_pos)
-        self.assertAlmostEqual(exp_total_dx, ma.total_dx)
-        self.assertAlmostEqual(exp_total_dy, ma.total_dy)
+        assert exp_gesture == ma.ex_gesture
+        assert exp_pos == pytest.approx(ma.ex_pos)
+        assert round(abs(exp_total_dx - ma.total_dx), 7) == 0
+        assert round(abs(exp_total_dy - ma.total_dy), 7) == 0
