@@ -33,13 +33,11 @@ def callback(event, x, y, flags, param):
         drawing.set_pen_color(param[1][y, x])
 
 
-def main_cam(phone_cam):
-    cap, fps = init_cam(phone_cam)
+def main_cam(phone_cam, video_path=None, imgs_paths=None):
+    cap, fps = init_cam(phone_cam, video_path, imgs_paths)
     fps_count = 0.0
     W = cap.get(3)
     H = cap.get(4)
-    # W = 1920
-    # H = 1080
     drawing = Drawing(W, H)
     ma = MotionAnalyser(W, H, drawing)
     mp_hands = mp.solutions.hands
@@ -50,6 +48,9 @@ def main_cam(phone_cam):
 
     while True:
         frame = cap.read()
+        if frame is None:
+            print("End of sequence")
+            break
         frame = cv2.flip(frame, 1)
         cv2.setMouseCallback('Cam', callback, (drawing, frame))
         n_fingers_l, center_l = _count_fingers(frame, detector)
