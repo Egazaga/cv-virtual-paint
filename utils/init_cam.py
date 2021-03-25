@@ -51,7 +51,6 @@ class ImgSequenceCapture:
         return img
 
     def get(self, n):
-        print(self.imgs_paths[0])
         if n == 3:
             return cv2.imread(self.imgs_paths[0], cv2.IMREAD_COLOR).shape[1]
         if n == 4:

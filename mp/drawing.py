@@ -15,10 +15,10 @@ class Drawing:
         self.ex_action = None
         self.canvas = np.zeros((int(H * 3), int(W * 3), 3), dtype=np.uint8)
         self.view_center = int(W * 1.5), int(H * 1.5)
-        cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
-        for x in range(4):
-            for y in range(4):
-                cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        # cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        # for x in range(4):
+        #     for y in range(4):
+        #         cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         self.view_corner = int(W), int(H)
         self.scale_factor = 1
         self.W, self.H = int(W), int(H)
@@ -86,7 +86,8 @@ class Drawing:
                self.view_corner[0]:self.view_corner[0] + int(self.W * self.scale_factor)]
         if self.scale_factor != 1:
             view = cv2.resize(view, dsize=(self.W, self.H), interpolation=cv2.INTER_LINEAR)
-        frame = cv2.addWeighted(frame, 0.5, view, 0.7, 0)
+        # frame = cv2.addWeighted(frame, 0.5, view, 0.7, 0)
+        frame = cv2.addWeighted(frame, 1, view, 1, 0)  # clear pic
         if draw_circle:
             frame = cv2.circle(frame, (x, y), int(thickness / 2), [0, 0, 255], 3)
         return frame
@@ -108,7 +109,7 @@ class Drawing:
     def scale(self, dy, speed=2.5):
         speed = 1080 / speed
         new_scale = self.scale_factor + dy / speed
-        if 0.5 < new_scale < 3:
+        if 0.5 <= new_scale <= 3:
             if new_scale > self.scale_factor:
                 bottom_right_w_in_next_frame = self.view_corner[0] + self.W * new_scale
                 bottom_right_h_in_next_frame = self.view_corner[1] + self.H * new_scale

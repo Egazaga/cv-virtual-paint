@@ -84,6 +84,7 @@ def main_cam(phone_cam, video_path=None, imgs_paths=None):
             break
 
     cv2.destroyAllWindows()
+    return drawing, ma  # for testing
 
 
 if __name__ == '__main__':
