@@ -5,6 +5,12 @@ from mp.drawing import Drawing
 from utils.motion_analyser import MotionAnalyser
 
 class TestDrawingAfterColorChanged:
+    # G
+    #   G       
+    #     G   
+    #       B
+    #         B
+    #           B
     def test_draw_after_color_green_to_blue(self):
         drawing = Drawing(1920, 1080)
         ma = MotionAnalyser(1080, 1920, drawing)
