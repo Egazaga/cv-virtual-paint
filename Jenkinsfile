@@ -15,13 +15,13 @@ pipeline {
 
         stage('unit testing') {
             steps {
-                sh "pytest test/unit"
+                sh "pytest tests/unit"
             }
         }
 
         stage('integration testing') {
             steps {
-                sh "pytest test/integration"
+                sh "pytest tests/integration"
             }
         }
     }
