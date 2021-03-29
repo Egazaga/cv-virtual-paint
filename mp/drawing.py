@@ -52,7 +52,7 @@ class Drawing:
             self.ex_pen_pos = 0, 0
         elif action != self.ex_action:
             self.ex_action = action
-            self.ex_pen_pos = 0, 0
+            self.ex_pen_pos = x, y
         elif self.ex_pen_pos == (0, 0):
             x = round(x * self.scale_factor)
             y = round(y * self.scale_factor)

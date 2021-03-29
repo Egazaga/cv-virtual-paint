@@ -70,14 +70,14 @@ class TestProcessFrame:
         drawing.process_frame(frame=frame, x=5, y=5, area=200, action="Yellow")
         drawing.process_frame(frame=frame, x=10, y=10, area=200, action="Blue")
         assert drawing.ex_action == "Blue"
-        assert drawing.ex_pen_pos == (0, 0)
+        assert drawing.ex_pen_pos == (10, 10)
 
     def test_process_frame_no_previous_pen(self):
         drawing = Drawing(1920, 1080)
         frame = np.zeros((1080, 1920, 3), dtype="uint8")
         drawing.process_frame(frame=frame, x=None, y=None, area=None, action="Blue")
         drawing.process_frame(frame=frame, x=10, y=10, area=200, action="Blue")
-        assert drawing.ex_pen_pos == (0, 0)
+        assert drawing.ex_pen_pos == (10, 10)
 
 
 class TestScale:
