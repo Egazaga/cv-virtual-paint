@@ -1,18 +1,12 @@
 pipeline {
     agent {
         docker {
-            image 'python:3'
+            image 'yaroslaver/cv-virtual-paint'
             args '--shm-size=1g -u root'
         }
     }
 
     stages {
-        stage('install requirements') {
-            steps {
-                sh "pip3 install -r requirements.txt"
-            }
-        }
-
         stage('unit testing') {
             steps {
                 sh "pytest tests/unit"
