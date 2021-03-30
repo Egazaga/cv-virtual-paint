@@ -2,7 +2,7 @@ from mp.drawing import Drawing
 from utils.motion_analyser import MotionAnalyser
 
 
-class TestDrawingAfterMovingOrScaling:
+class TestMovingAndScalingCombinations:
     def test_mr_sd(self):
         drawing = Drawing(1920, 1080)
         ma = MotionAnalyser(1080, 1920, drawing)
