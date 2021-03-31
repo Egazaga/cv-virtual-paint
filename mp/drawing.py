@@ -6,21 +6,21 @@ import numpy as np
 
 
 class Drawing:
-    def __init__(self, W, H):
+    def __init__(self, W, H, default_pen_color=None):
+        if default_pen_color is None:
+            default_pen_color = [174, 166, 223]
         self.d_color_range = np.array([20, 50, 50])
-        init_pen_color = np.array([174, 166, 223])
-        self.pen_color_range = np.array([init_pen_color - self.d_color_range, init_pen_color + self.d_color_range])
+        self.pen_color_range = np.array([default_pen_color - self.d_color_range, default_pen_color + self.d_color_range])
         self.noise_threshold = 200
         self.ex_pen_pos = 0, 0
         self.ex_action = None
         self.canvas = np.zeros((int(H * 3), int(W * 3), 3), dtype=np.uint8)
-        self.view_center = int(W * 1.5), int(H * 1.5)
-        # cv2.circle(self.canvas, self.view_center, color=[0, 0, 255], radius=25, thickness=-10)  # debug
+        # cv2.circle(self.canvas, (int(W * 1.5), int(H * 1.5)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         # for x in range(4):
         #     for y in range(4):
         #         cv2.circle(self.canvas, (int(W * x), int(H * y)), color=[0, 0, 255], radius=25, thickness=-10)  # debug
         self.view_corner = int(W), int(H)
-        self.scale_factor = 1
+        self.scale_factor = 1.0
         self.W, self.H = int(W), int(H)
         self.thickness_scale = 2
 
@@ -51,15 +51,14 @@ class Drawing:
             self.ex_action = None
             self.ex_pen_pos = 0, 0
         elif action != self.ex_action:
+            x, y = round(x * self.scale_factor), round(y * self.scale_factor)
             self.ex_action = action
-            self.ex_pen_pos = x, y
+            self.ex_pen_pos = (x + self.view_corner[0], y + self.view_corner[1])
         elif self.ex_pen_pos == (0, 0):
-            x = round(x * self.scale_factor)
-            y = round(y * self.scale_factor)
+            x, y = round(x * self.scale_factor), round(y * self.scale_factor)
             self.ex_pen_pos = (x + self.view_corner[0], y + self.view_corner[1])
         else:  # if we have same action, and coordinates of a pen from previous frame
-            x = round(x * self.scale_factor)
-            y = round(y * self.scale_factor)
+            x, y = round(x * self.scale_factor), round(y * self.scale_factor)
             color = []
             thickness = int(math.sqrt(area) * self.thickness_scale)
             if action == "Erasing":
@@ -89,6 +88,7 @@ class Drawing:
         # frame = cv2.addWeighted(frame, 0.5, view, 0.7, 0)
         frame = cv2.addWeighted(frame, 1, view, 1, 0)  # clear pic
         if draw_circle:
+            x, y = round(x / self.scale_factor), round(y / self.scale_factor)
             frame = cv2.circle(frame, (x, y), int(thickness / 2), [0, 0, 255], 3)
         return frame
 

@@ -77,6 +77,7 @@ class TestProcessFrame:
         frame = np.zeros((1080, 1920, 3), dtype="uint8")
         drawing.process_frame(frame=frame, x=None, y=None, area=None, action="Blue")
         drawing.process_frame(frame=frame, x=10, y=10, area=200, action="Blue")
+        print(drawing.ex_pen_pos)
         assert drawing.ex_pen_pos == (10, 10)
 
 

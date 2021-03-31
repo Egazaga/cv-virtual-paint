@@ -15,8 +15,8 @@ class MotionAnalyser:
         self.min_length_of_move_y = int(cam_height * 0.4)
         self.ex_pos = (cam_width / 2, cam_height / 2)
         self.ex_gesture = None
-        self.total_dx = 0
-        self.total_dy = 0
+        self.total_dx = 0.0
+        self.total_dy = 0.0
         self.drawing = drawing
 
     def analyse(self, pos, gesture):

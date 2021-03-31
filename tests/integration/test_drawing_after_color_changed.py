@@ -1,8 +1,10 @@
-import numpy as np
 import math
+
+import numpy as np
 
 from mp.drawing import Drawing
 from utils.motion_analyser import MotionAnalyser
+
 
 class TestDrawingAfterColorChanged:
     # G
@@ -46,13 +48,13 @@ class TestDrawingAfterColorChanged:
         drawing.process_frame(frame=frame, x=400, y=300, area=196, action="Blue")
         drawing.process_frame(frame=frame, x=400, y=300, area=196, action="Blue")
         drawing.process_frame(frame=frame, x=300, y=400, area=196, action="Blue")
-        #cross top-left part
+        # cross top-left part
         for x in range(300, int(350 - 14 / math.sqrt(2))):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([0, 255, 0])).all(), x
-        #cross intersection part
+        # cross intersection part
         for x in range(int(350 - 14 / math.sqrt(2)) + 1, int(350 + 14 / math.sqrt(2))):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([255, 0, 0])).all(), x
-        #after cross intersection, must be same as topleft
+        # after cross intersection, must be same as topleft
         for x in range(int(350 + 14 / math.sqrt(2)) + 2, 400):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([0, 255, 0])).all(), x
 
@@ -97,12 +99,11 @@ class TestDrawingAfterColorChanged:
         drawing.process_frame(frame=frame, x=400, y=400, area=12, action="Erasing")
         drawing.process_frame(frame=frame, x=400, y=400, area=12, action="Erasing")
         drawing.process_frame(frame=frame, x=350, y=350, area=12, action="Erasing")
-        
+
         for x in range(300, 350 - int(math.sqrt(int(math.sqrt(12) * 2.0) * 2.0)) - 1):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([0, 255, 0])).all(), x
         for x in range(350 - int(math.sqrt(int(math.sqrt(12) * 2.0) * 2.0)), 400):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([0, 0, 0])).all(), x
-
 
     # G
     #   G       blk
@@ -125,13 +126,12 @@ class TestDrawingAfterColorChanged:
         drawing.process_frame(frame=frame, x=400, y=300, area=196, action="Black")
         drawing.process_frame(frame=frame, x=400, y=300, area=196, action="Black")
         drawing.process_frame(frame=frame, x=300, y=400, area=196, action="Black")
-        #cross top-left part
+        # cross top-left part
         for x in range(300, int(350 - 14 / math.sqrt(2))):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([0, 255, 0])).all(), x
-        #cross intersection part
+        # cross intersection part
         for x in range(int(350 - 14 / math.sqrt(2)) + 1, int(350 + 14 / math.sqrt(2))):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([255, 255, 255])).all(), x
-        #after cross intersection, must be same as topleft
+        # after cross intersection, must be same as topleft
         for x in range(int(350 + 14 / math.sqrt(2)) + 2, 400):
             assert (drawing.canvas[x + 330, x + 1920] == np.array([255, 0, 0])).all(), x
-    

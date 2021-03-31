@@ -5,6 +5,7 @@ from imutils.video import FPS
 from mp.drawing import Drawing
 from utils.init_cam import init_cam
 from utils.motion_analyser import MotionAnalyser
+from mp.logger import Logger
 
 
 def _count_fingers(frame, detector, hand="Left"):
@@ -33,13 +34,14 @@ def callback(event, x, y, flags, param):
         drawing.set_pen_color(param[1][y, x])
 
 
-def main_cam(phone_cam, video_path=None, imgs_paths=None):
+def main_cam(phone_cam, video_path=None, imgs_paths=None, default_pen_color=None):
     cap, fps = init_cam(phone_cam, video_path, imgs_paths)
     fps_count = 0.0
     W = cap.get(3)
     H = cap.get(4)
-    drawing = Drawing(W, H)
+    drawing = Drawing(W, H, default_pen_color)
     ma = MotionAnalyser(W, H, drawing)
+    logger = Logger(drawing, ma)
     mp_hands = mp.solutions.hands
     detector = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
     pairs = {3: "Yellow", 5: "Erasing", 0: "Green", 2: "Brown", 1: "Blue", 4: "Black"}
@@ -48,6 +50,8 @@ def main_cam(phone_cam, video_path=None, imgs_paths=None):
 
     while True:
         frame = cap.read()
+        if isinstance(frame, tuple):
+            frame = frame[1]
         if frame is None:
             print("End of sequence")
             break
@@ -80,11 +84,12 @@ def main_cam(phone_cam, video_path=None, imgs_paths=None):
                     fontScale=2, color=(0, 255, 20), thickness=3)
 
         cv2.imshow('Cam', frame)
+        logger.log(n_fingers_l, center_l, (x, y), area)
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
     cv2.destroyAllWindows()
-    return drawing, ma  # for testing
+    return logger
 
 
 if __name__ == '__main__':
