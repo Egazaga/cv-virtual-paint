@@ -1,0 +1,2 @@
+[run]
+omit = mp/logger.py, mp/main.py, mp/main_cam_loop.py, utils/init_cam.py

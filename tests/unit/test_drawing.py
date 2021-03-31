@@ -61,7 +61,7 @@ class TestProcessFrame:
         drawing = Drawing(1920, 1080)
         frame = np.zeros((1080, 1920, 3), dtype="uint8")
         drawing.process_frame(frame=frame, x=None, y=None, area=None, action=None)
-        assert drawing.ex_action == None
+        assert drawing.ex_action is None
         assert drawing.ex_pen_pos == (0, 0)
 
     def test_process_frame_action_changed(self):

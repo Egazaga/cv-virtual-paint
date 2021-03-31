@@ -2,30 +2,11 @@ import cv2
 import mediapipe as mp
 from imutils.video import FPS
 
+from mp.count_fingers import count_fingers
 from mp.drawing import Drawing
 from utils.init_cam import init_cam
 from utils.motion_analyser import MotionAnalyser
 from mp.logger import Logger
-
-
-def _count_fingers(frame, detector, hand="Left"):
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    frame.flags.writeable = False
-    results = detector.process(frame)
-    frame.flags.writeable = True
-    n_fingers_l, center_l = None, None
-
-    if results.multi_hand_landmarks:
-        for mh, lm in zip(results.multi_handedness, results.multi_hand_landmarks):
-            # mp_drawing.draw_landmarks(frame, lm, HAND_CONNECTIONS)
-            label = mh.classification[0].label
-            lm = lm.landmark
-            if label == hand:
-                n_fingers_l = (lm[4].x > lm[3].x) + (lm[8].y < lm[7].y) + (lm[12].y < lm[11].y) + (
-                        lm[16].y < lm[15].y) + (lm[20].y < lm[19].y)
-                sh = frame.shape
-                center_l = (lm[9].x * sh[1], lm[9].y * sh[0])
-    return n_fingers_l, center_l
 
 
 def callback(event, x, y, flags, param):
@@ -57,7 +38,7 @@ def main_cam(phone_cam, video_path=None, imgs_paths=None, default_pen_color=None
             break
         frame = cv2.flip(frame, 1)
         cv2.setMouseCallback('Cam', callback, (drawing, frame))
-        n_fingers_l, center_l = _count_fingers(frame, detector)
+        n_fingers_l, center_l = count_fingers(frame, detector)
         x, y, area = drawing.find_pen(frame)
         if x is None:  # no pen in frame
             ma.analyse(center_l, n_fingers_l)
