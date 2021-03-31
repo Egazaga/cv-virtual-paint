@@ -18,11 +18,5 @@ pipeline {
                 sh "pytest tests/integration"
             }
         }
-
-        stage('system testing') {
-            steps {
-                sh "pytest tests/system"
-            }
-        }
     }
 }
