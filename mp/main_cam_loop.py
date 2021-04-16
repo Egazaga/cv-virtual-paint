@@ -29,13 +29,19 @@ def main_cam(phone_cam, video_path=None, imgs_paths=None, default_pen_color=None
     cv2.namedWindow("Cam", cv2.WINDOW_NORMAL)
     cv2.setWindowProperty("Cam", cv2.WND_PROP_FULLSCREEN, 1)
 
+    n_skipped_frames = 0
+
     while True:
         frame = cap.read()
         if isinstance(frame, tuple):
             frame = frame[1]
-        if frame is None:
-            print("End of sequence")
-            break
+        if frame is None or frame.size == 0:
+            n_skipped_frames += 1
+            print("Skipped", n_skipped_frames)
+            if n_skipped_frames == 90:
+                print("End of sequence")
+                break
+            continue
         frame = cv2.flip(frame, 1)
         cv2.setMouseCallback('Cam', callback, (drawing, frame))
         n_fingers_l, center_l = count_fingers(frame, detector)
