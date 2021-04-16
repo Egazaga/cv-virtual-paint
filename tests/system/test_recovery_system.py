@@ -11,6 +11,6 @@ class TestSimpleSystem:
                       "tests/images/hand_2.jpeg",
                       "tests/images/hand_3.jpeg"]
         logger = main_cam(phone_cam=False, imgs_paths=imgs_paths, default_pen_color=[178, 230, 80])
-        logger.save_to_disk("tests/system/recovery_info.csv")
+        # logger.save_to_disk("tests/system/recovery_info.csv")
         right = pd.read_csv("tests/system/recovery_info.csv")
         pd.testing.assert_frame_equal(logger.memory, right)
