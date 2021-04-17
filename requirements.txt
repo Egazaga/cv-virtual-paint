@@ -6,3 +6,4 @@ dataclasses~=0.6
 mediapipe~=0.8.2
 pytest==6.2.2
 pandas==1.2.3
+pystress

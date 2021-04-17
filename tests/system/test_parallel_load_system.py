@@ -20,11 +20,11 @@ def f(x):
 
 class TestSimpleSystem:
     def test_simple_system(self):
-        logger = main_cam(phone_cam=False, video_path="tests/images/load_test_30fps.mp4",
-                          default_pen_color=[0, 0, 255])
         procs = cpu_count()
         pool = Pool(procs)
-        pool.map(f, range(procs * 4))
+        pool.map_async(f, range(procs))
+        logger = main_cam(phone_cam=False, video_path="tests/images/load_test_30fps.mp4",
+                          default_pen_color=[0, 0, 255])
         exit_child(0, 0)
         right = pd.read_csv("tests/system/load_system_info.csv")
         pd.testing.assert_frame_equal(logger.memory, right)
